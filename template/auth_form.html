@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+    <html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <title>Форма аутентификации</title>
+        <link rel="stylesheet" href="res/style/style.css">
+            <style>
+                .qeustion {
+                    font-weight: 800;
+                }
+                div {
+                    margin: 20 0;
+                }
+                .back_button {
+                    background-color: red;
+                }
+            </style>
+    </head>
+    <body>    
+    <form class="form" action="http://localhost:8080/auth" method="post" enctype="application/x-www-form-urlencoded">
+        <h1 class="form_title">Вход</h1>
+        {{range .Questions}}
+         <div>Контрольный вопрос:</div>
+         <div class="qeustion"> {{ . }}:</div>
+        <input placeholder="Ответ" name="answer" required>
+        {{end}}
+        {{if .IsThereError}}
+        <p>Вы неправильно ответили на контрольные вопросы. Оставшееся кол-во попыток входа: {{.RemainingCountAttempts}}</p>
+        {{end}}
+        <button class="form__button">ВОЙТИ</button>
+        <button class="back_button" form="back">Назад</button>
+    </form>
+    <form action="http://localhost:8080/login" method="get" enctype="application/x-www-form-urlencoded" id="back"></form>
+    </body>
+    </html>

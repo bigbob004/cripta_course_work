@@ -1,0 +1,53 @@
+<DOCTYPE html>
+    <html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <title>Форма добавления вопросов для нового пользователя</title>
+        <link rel="stylesheet" href="res/style/style.css">
+        <style>
+            .phrase {
+                margin: 20 0;
+                text-align: center;
+                color: #A9A9A9;;
+            }
+            .question_number{
+                font-weight: 800;
+                text-align: left;
+                margin: 20 0
+            }
+            input {
+                margin: 10 0
+            }
+            .flex_buttons {
+                display: flex;
+                justify-content: space-between;
+            }
+            .back_button {
+                background-color: red;
+            }
+        </style>
+        <script src="res/add_question.js"></script>
+    </head>
+    <body>
+    <form class="form" action="http://localhost:8080/send_new_user" method="post" enctype="application/x-www-form-urlencoded">
+        <h1 class="form_title">Регистрация нового пользователя</h1>
+        <input placeholder="Логин" name="user_name" required>
+        <input type="number" placeholder="Максимальное допустимое количество неверных попыток ответа на контрольный вопрос" name="count_of_invalid_attempts" required min="1" max="5">
+        <input placeholder="Количество обязательных вопросов" name="count_of_required_questions" required>
+        <div class="question_block">
+            <div class="form_group">
+                <div class="question_number"> Вопрос <span class="number">1</span>. </div>
+                <input placeholder="Вопрос" name="question" required>
+                <input placeholder="Ответ" name="answer" required>
+            </div>
+        </div>
+
+        <div class="flex_buttons">
+            <div class="button" onclick="add_question()">Добавить вопрос</div>
+            <button type="submit">Сохранить</button>
+            <button class="back_button" form="back">Отменить</button>
+        </div>
+    </form>
+    <form action="http://localhost:8080/account" method="get" enctype="application/x-www-form-urlencoded" id="back"></form>
+    </body>
+    </html>

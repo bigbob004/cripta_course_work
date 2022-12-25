@@ -1,0 +1,52 @@
+<DOCTYPE html>
+    <html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <title>Форма аутентификации</title>
+        <link rel="stylesheet" href="style/style.css">
+        <style>
+            .phrase {
+                margin: 20 0;
+                text-align: center;
+                color: #A9A9A9;;
+            }
+            .question_number{
+                font-weight: 800;
+                text-align: left;
+                margin: 20 0
+            }
+            input {
+                margin: 10 0
+            }
+            .flex_buttons {
+                display: flex;
+                justify-content: space-between;
+            }
+            .back_button {
+                background-color: red;
+            }
+        </style>
+    </head>
+    <body>    
+    <form class="form">
+        
+        <h1 class="form_title">Редактор контрольных вопросов</h1>
+        <!--Добавляем го-шный шаблон для того, чтобы понять, сколько отрисовывать вопросов-->
+        <div class="question_number"> Вопрос 1. </div>
+        <div class="form_group">
+            <select placeholder="Вопрос">
+                <option>Пункт 1</option>
+                <option>Пункт 2</option>
+              </select>
+            
+            <input placeholder="Ответ">
+         </div> 
+    
+         <div class="flex_buttons">
+            <button>Добавить вопрос</button>
+            <button>Сохранить</button>
+            <button class="back_button">Отменить</button>
+        </div>
+    </form>
+    </body>
+    </html>

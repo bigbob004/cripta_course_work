@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+    <html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <title>Форма аутентификации</title>
+        <link rel="stylesheet" href="res/style/style.css">
+        <style>
+            .flex_buttons {
+                display: flex;
+                justify-content: space-between;
+            }
+            .back_button {
+                background-color: red;
+            }
+            .ramka{
+                height: 50px;
+            }
+            button {
+                margin-top: 0;
+            }
+        </style>
+    </head>
+    <body>
+    <!--Тут можно отрисовывать разный интерфейс для админа и обычного пользователя-->
+    {{if eq .UserName "admin"}}
+    <form class="form" action="http://localhost:8080/send_new_user" method="get" enctype="application/x-www-form-urlencoded">
+    
+    
+         <div class="form_group">
+
+            <div class="ramka">Пользователь: <strong>{{.UserName}}</strong></div>
+        </div>
+    
+         <div class="flex_buttons">
+            <!--Добавляем го-шный шаблон для того, чтобы понять, отрисовывать ли кнопку добавления пользователя-->
+            <button form="edit_questions">Редактор контрольных вопросов </button>
+            <button type="submit">Добавить пользователя</button>
+            <button class="back_button" form="exit">Выход</button>
+        </div>
+        <div class="form_group">
+            <!--Добавляем го-шный шаблон для того, чтобы в случае, если пользователь админ, то отобразить всех пользователей-->
+            <div class="ramka">Список пользователей: <strong>Имя пользователя</strong></div>
+        </div>
+    </form>
+    <form action="http://localhost:8080/edit_questions" method="get" enctype="application/x-www-form-urlencoded" id="edit_questions"></form>
+    <form action="http://localhost:8080/signout" method="post" enctype="application/x-www-form-urlencoded" id="exit"></form>
+    {{else}}
+    <form class="form" action="http://localhost:8080/signout" method="post" enctype="application/x-www-form-urlencoded">
+        <div class="form_group">
+            <div class="ramka">Пользователь: <strong>{{.UserName}}</strong></div>
+        </div>
+
+        <div class="flex_buttons">
+            <button class="back_button">Выход</button>
+        </div>
+    </form>
+    {{end}}
+    </body>
+    </html>

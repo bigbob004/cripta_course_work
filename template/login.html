@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+    <html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <title>Форма аутентификации</title>
+        <link rel="stylesheet" href="res/style/style.css">
+        <style>
+            .back_button {
+                background-color: red;
+            }
+        </style>
+    </head>
+    <body>    
+    <form class="form" action="http://localhost:8080/login" method="post" enctype="application/x-www-form-urlencoded">
+        
+        <h1 class="form_title">Вход</h1>
+    
+         <div class="form_group">
+            <input placeholder="Логин" name="user_name" required>
+            {{if .IsThereError}}
+             <p>Пользователь не зарегистрирован, обратиться к администратору</p>
+             {{end}}
+         </div>
+
+        <button class="form__button">ВОЙТИ</button>
+        <!-- TODO по этой кнопке сделать graceFulShutDown-->
+        <button class="back_button" form="exit">Выход</button>
+    </form>
+    <form action="http://localhost:8080/exit" method="post" enctype="application/x-www-form-urlencoded" id="exit"></form>
+    </body>
+    </html>

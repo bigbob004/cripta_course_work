@@ -1,0 +1,37 @@
+<DOCTYPE html>
+    <html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <title>Форма аутентификации</title>
+        <link rel="stylesheet" href="style/style.css">
+        <style>
+            .flex_buttons {
+                display: flex;
+                justify-content: space-between;
+            }
+            .back_button {
+                background-color: red;
+            }
+            .ramka{
+                height: 50px;
+            }
+            button {
+                margin-top: 0;
+            }
+        </style>
+    </head>
+    <body>    
+    <form class="form" action="http://localhost:8080/send_new_user" method="get" enctype="application/x-www-form-urlencoded">
+    
+    
+         <div class="form_group">
+            <div class="ramka">Учётная запись пользователя: <strong>Имя пользователя</strong></div>
+             <p><input type="checkbox" id="is_blocked" name="is_blocked">Заблокировать пользователя?</p>
+        </div>
+         <div class="flex_buttons">
+            <button>Редактор контрольных вопросов</button>
+            <button class="back_button">Выход</button>
+        </div>
+    </form>
+    </body>
+    </html>

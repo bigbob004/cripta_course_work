@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+    <html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <title>Форма аутентификации</title>
+        <link rel="stylesheet" href="res/style/style.css">
+        <style>
+            .phrase {
+                margin: 20 0;
+                text-align: center;
+                color: #A9A9A9;;
+            }
+            .question_number{
+                font-weight: 800;
+                text-align: left;
+                margin: 20 0
+            }
+            input {
+                margin: 10 0
+            }
+            .flex_buttons {
+                display: flex;
+                justify-content: space-between;
+            }
+            .back_button {
+                background-color: red;
+            }
+        </style>
+    </head>
+    <body>
+    {{range $index, $element := .}}
+    <form class="form" action="http://localhost:8080/?????" method="post" enctype="application/x-www-form-urlencoded">
+    <div class="question_number"> Вопрос {{inc $index}}. </div>
+    <div class="form_group">
+        <input type="hidden" name="id" value="{{$element.QuestionID}}">
+        <p>Вопрос</p>
+        <input placeholder="Вопрос" name="question" value="{{$element.Title}}">
+        <p>Ответ</p>
+        <input placeholder="Ответ" name="answer" value="{{$element.Answer}}">
+    </div>
+    </form>>
+    {{end}}
+    <form class="form" action="http://localhost:8080/send_new_user" method="post" enctype="application/x-www-form-urlencoded">
+        
+        <h1 class="form_title">Редактор контрольных вопросов</h1>
+
+         <div class="flex_buttons">
+            <button>Добавить вопрос</button>
+            <button>Сохранить</button>
+            <button class="back_button">Отменить</button>
+        </div>
+    </form>
+    </body>
+    </html>

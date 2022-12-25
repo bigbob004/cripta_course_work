@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}   
+
+.form {
+    width: 500px;
+    padding: 16px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    font-family: 'Montserrat';
+    letter-spacing: 1px;
+}
+    
+input, button, select {
+    font-family:'Montserrat';
+    letter-spacing: 1px;
+    font-size: 16px;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+input, select{
+    width: 100%;
+    border: solid 2px black;
+    margin: 10 0
+}
+
+
+button, .button {
+    margin-top: 30px;
+    border-radius: 10px;
+    background: #0071F0;
+    color: white;
+    border: none;
+    padding: 5px 25px;
+    font-size: 13px;
+    width: min-content;
+    cursor: pointer;
+}
+
+.back_button {
+    background-color: red;
+}
+    
+.form_title {
+    text-align: center;
+    margin: 0 0 32px 0;
+    font-weight: normal;
+}
+    
+.form__group {
+    position: relative;
+    margin-bottom: 32px;
+}
+
+.ramka{
+    border: 1px solid black; /* Белая рамка */
+    border-radius: 5px; /* Радиус скругления */
+    margin: 20 0
+}

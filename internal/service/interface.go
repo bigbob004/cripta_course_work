@@ -7,9 +7,14 @@ import (
 
 type Authorization interface {
 	CreateUser(user model.User, questions []model.Question) error
-	SignIn(userName string) (*model.User, error)
+	GetUserByUserName(userName string) (*model.User, error)
 	GetQuestionsByUserID(userID int) ([]model.Question, error)
-	ValidateQuestions(userAnswers []string, user *model.ShitUser) bool
+	ValidateQuestions(userAnswers []string, user *model.Cache) bool
+	GetAllUsers() ([]model.User, error)
+	UpdateUser(user model.User) error
+	UpdateQuestion(question model.Question) error
+	DropQuestion(questionID int) error
+	AddQuestion(question model.Question) (int, error)
 	//GenerateToken(username string) (string, error)
 }
 

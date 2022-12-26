@@ -17,8 +17,11 @@
     
          <div class="form_group">
             <input placeholder="Логин" name="user_name" required>
-            {{if .IsThereError}}
-             <p>Пользователь не зарегистрирован, обратиться к администратору</p>
+            {{if .IsThereUserWithUserName}}
+             <p>Пользователь заблокирован, обратитесь к администратору</p>
+             {{end}}
+             {{if .IsUserBlocked}}
+             <p>Пользователь заблокирован, обратитесь к администратору</p>
              {{end}}
          </div>
 

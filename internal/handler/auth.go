@@ -28,18 +28,18 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
 				userAnswers = values
 			}
 		}
-		isEqual := h.services.ValidateQuestions(userAnswers, h.questionOfCurrentUser)
+		isEqual := h.services.ValidateQuestions(userAnswers, h.cache)
 		if isEqual {
 			http.Redirect(w, r, "/account", http.StatusMovedPermanently)
 		} else {
-			if h.questionOfCurrentUser.RemainingCountAttempts-1 == 0 {
+			if h.cache.RemainingCountAttempts-1 == 0 {
 				http.Redirect(w, r, "/exit", http.StatusMovedPermanently)
 			}
-			h.questionOfCurrentUser.RemainingCountAttempts--
+			h.cache.RemainingCountAttempts--
 			data := ViewDataForAuth{
 				IsThereError:           true,
-				Questions:              h.questionOfCurrentUser.ShuffleQuestions,
-				RemainingCountAttempts: h.questionOfCurrentUser.RemainingCountAttempts,
+				Questions:              h.cache.ShuffleQuestions,
+				RemainingCountAttempts: h.cache.RemainingCountAttempts,
 			}
 			tmpl, _ := template.ParseFiles("./template/auth_form.html")
 			tmpl.Execute(w, data)
@@ -54,48 +54,49 @@ func (h *Handler) AuthView(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("что-то пошло не так"))
 			return
 		}
-		userIDStr := r.URL.Query().Get("user_id")
-		if userIDStr == "" {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("500 - Something bad happened!"))
-			return
-		}
-		userID, _ := strconv.Atoi(userIDStr)
-		questionsAndAnswers, err := h.services.GetQuestionsByUserID(userID)
-		h.questionOfCurrentUser.ModelQuestion = questionsAndAnswers
-		if err != nil {
-			logrus.Error("internal/handler/auth: ", err)
-			w.Write([]byte("что-то пошло не так"))
-			return
-		}
+		if h.cache.ShuffleQuestions == nil {
+			userIDStr := r.URL.Query().Get("user_id")
+			if userIDStr == "" {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte("500 - Something bad happened!"))
+				return
+			}
+			userID, _ := strconv.Atoi(userIDStr)
+			questionsAndAnswers, err := h.services.GetQuestionsByUserID(userID)
+			h.cache.ModelQuestion = questionsAndAnswers
+			if err != nil {
+				logrus.Error("internal/handler/auth: ", err)
+				w.Write([]byte("что-то пошло не так"))
+				return
+			}
 
-		//TODO КОСТЫЛИ ЕБУЧИЕ, ЗА ЭТО ТЫ ПОПАДЁШЬ В АД!
-		questions := make([]string, 0, len(questionsAndAnswers))
-		questionToAnswer := make(map[string]string, len(questionsAndAnswers))
-		for _, item := range questionsAndAnswers {
-			questions = append(questions, item.Title)
-			questionToAnswer[item.Title] = item.Answer
+			//TODO КОСТЫЛИ ЕБУЧИЕ, ЗА ЭТО ТЫ ПОПАДЁШЬ В АД!
+			questions := make([]string, 0, len(questionsAndAnswers))
+			questionToAnswer := make(map[string]string, len(questionsAndAnswers))
+			for _, item := range questionsAndAnswers {
+				questions = append(questions, item.Title)
+				questionToAnswer[item.Title] = item.Answer
+			}
+			//выбираем подмн-во обязательных вопросов из общего кол-ва вопросов данного пользователя
+			subSetQuestions := tools.UniqueSubSet(questions, h.cache.CountOfRequiredQuestions)
+			subSetQuestionToAnswer := make(map[string]string, h.cache.CountOfRequiredQuestions)
+			for _, item := range subSetQuestions {
+				subSetQuestionToAnswer[item] = questionToAnswer[item]
+			}
+			h.cache.Questions = subSetQuestions
+			h.cache.AuthQuestionToAnswer = subSetQuestionToAnswer
+
+			subSetOptionalQuestions := tools.UniqueSubSet(service.OptionalQuestions, service.CountOfOptionalQuestionsWhileAuth)
+
+			authQuestions := make([]string, 0, len(subSetQuestions)+len(subSetOptionalQuestions))
+			authQuestions = append(authQuestions, subSetQuestions...)
+			authQuestions = append(authQuestions, subSetOptionalQuestions...)
+			tools.ShuffleSlice(authQuestions)
+			h.cache.ShuffleQuestions = authQuestions
 		}
-		//выбираем подмн-во обязательных вопросов из общего кол-ва вопросов данного пользователя
-		subSetQuestions := tools.UniqueSubSet(questions, h.questionOfCurrentUser.CountOfRequiredQuestions)
-		subSetQuestionToAnswer := make(map[string]string, h.questionOfCurrentUser.CountOfRequiredQuestions)
-		for _, item := range subSetQuestions {
-			subSetQuestionToAnswer[item] = questionToAnswer[item]
-		}
-		h.questionOfCurrentUser.Questions = subSetQuestions
-		h.questionOfCurrentUser.AuthQuestionToAnswer = subSetQuestionToAnswer
-
-		subSetOptionalQuestions := tools.UniqueSubSet(service.OptionalQuestions, service.CountOfOptionalQuestionsWhileAuth)
-
-		authQuestions := make([]string, 0, len(subSetQuestions)+len(subSetOptionalQuestions))
-		authQuestions = append(authQuestions, subSetQuestions...)
-		authQuestions = append(authQuestions, subSetOptionalQuestions...)
-		tools.ShuffleSlice(authQuestions)
-		h.questionOfCurrentUser.ShuffleQuestions = authQuestions
-
 		data := ViewDataForAuth{
 			IsThereError: false,
-			Questions:    h.questionOfCurrentUser.ShuffleQuestions,
+			Questions:    h.cache.ShuffleQuestions,
 		}
 		tmpl, _ := template.ParseFiles("./template/auth_form.html")
 		tmpl.Execute(w, data)

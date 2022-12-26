@@ -1,4 +1,4 @@
-<DOCTYPE html>
+<!DOCTYPE html>
     <html lang="ru">
     <head>
         <meta charset="UTF-8">
@@ -29,11 +29,19 @@
         <script src="res/add_question.js"></script>
     </head>
     <body>
+    {{$errWithUserName := .IsThereUserWithUserNameErr}}
+    {{$errWithCountOfRequieredQuestions := .CountOfRequiredQuestionsErr}}
     <form class="form" action="http://localhost:8080/send_new_user" method="post" enctype="application/x-www-form-urlencoded">
         <h1 class="form_title">Регистрация нового пользователя</h1>
         <input placeholder="Логин" name="user_name" required>
+        {{if $errWithUserName}}
+        <p>Данное имя уже занято!</p>
+        {{end}}
         <input type="number" placeholder="Максимальное допустимое количество неверных попыток ответа на контрольный вопрос" name="count_of_invalid_attempts" required min="1" max="5">
         <input placeholder="Количество обязательных вопросов" name="count_of_required_questions" required>
+        {{if $errWithCountOfRequieredQuestions}}
+        <p>Количество обязательных вопросов не может быть больше количества введёных вопросов!</p>
+        {{end}}
         <div class="question_block">
             <div class="form_group">
                 <div class="question_number"> Вопрос <span class="number">1</span>. </div>

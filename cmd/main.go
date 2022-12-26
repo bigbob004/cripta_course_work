@@ -12,26 +12,14 @@ import (
 	"net/http"
 )
 
-//TODO в БД должно быть поле "кол-во обязательных вопросов" и "общее кол-во вопросов" обязательные - есть подмножество общего кол-ва вопросов
+//TODO валидации на пользовательский ввод (кол-во обязательных <= кол-ов вопросов)
 
-//TODO научиться различать админа и обычного пользователя - done
-//TODO по нажатию на кнопку "Выйти" из аккаунта - разлогинить пользователя - done
-//TODO можно также сделать мидлвару, которая будет проверять, аутентифицирован пользователь или нет (проверять на nil поле стр-ры questionOfCurrentUser) - done
-//TODO хэшировать id пользователя, чтобы он не отображался с параметрах get-запроса
-//TODO Gracefull shutdown (при превышении макc. кол-ва попыток входа) - done (не Gracefull shutdown, но завершается, перед завершением можно показывать формочку)
-//TODO валидация на форме создания вопросов для пользователя (кол-во обязательных вопросов <= кол-во введённых вопросов)
-//TODO рандомайзер вопросов - кажется, что done (нужно ещё потестить)
-//TODO сделать форму для редактирования вопросов конкретного пользователя (тут идея закостылить с id-шками вопросов, отрисовывая их прозрачным цветои, чтобы не видел пользователь, но при это я смошу получить эти id)
-//TODO баг по нажатию кнопки назад при добавлении нового пользователя
-//TODO баг по нажатию кнопки редактор контрольных вопросов
-//TODO прикрутить список пользователей к личному кабинету администратора и допилить работу с формой аккаунта юзера
-//TODO валидации на пользовательский ввод
-// TODO кнопка выхода у обучного юзера - баг
-// TODO проверка на существования пользователя с таким же username
+//TODO баг по нажатию кнопки назад при добавлении нового пользователя(чекай мидлвару)
 
-type ViewData struct {
-	isThereError bool
-}
+//TODO делаем 3 таблицы: редактирование вопросов конкретного пользователя (осталось сделать для обычного пользователя), редактирование пользователя (При удалении пользователя, должны удаляться с ним связанные вопросы, и нас разу должно выкидывать на предыдущий экран)
+//TODO повесить кнопку "Назад" на редакторы
+//TODO Админа удалять нельзя
+//TODO все вопросы пользователя удалить нельзя (мин кол-во вопросов 1)
 
 func main() {
 	logrus.SetFormatter(new(logrus.JSONFormatter))
@@ -55,15 +43,20 @@ func main() {
 	router.HandleFunc("/auth", handlers.Auth).Methods("POST")
 
 	router.HandleFunc("/send_new_user", handlers.CreateUser).Methods("POST")
-	router.HandleFunc("/send_new_user", func(writer http.ResponseWriter, request *http.Request) {
-		http.ServeFile(writer, request, "template/add_user.html")
-	}).Methods("GET")
+	router.HandleFunc("/send_new_user", handlers.CreateUserView).Methods("GET")
 
 	router.Handle("/account", handlers.Middleware(http.HandlerFunc(handlers.AccountView)))
 
-	router.Handle("/edit_questions", http.HandlerFunc(handlers.EditQuestionsView)).Methods("GET")
+	router.HandleFunc("/edit_questions", handlers.EditQuestionsView).Methods("GET")
+	router.HandleFunc("/edit_question", handlers.EditQuestion).Methods("GET")
+	router.HandleFunc("/edit_question_with_id", handlers.EditQuestionWithID).Methods("POST")
+	router.HandleFunc("/delete_question", handlers.DeleteQuestionWithID).Methods("POST")
+	router.HandleFunc("/add_question", handlers.AddQuestion).Methods("POST")
 
 	router.HandleFunc("/signout", handlers.SignOut).Methods("POST")
+
+	router.HandleFunc("/edit_user", handlers.EditUserView).Methods("GET")
+	router.HandleFunc("/block_user", handlers.BlockUser).Methods("POST")
 
 	router.HandleFunc("/exit", handlers.Exit).Methods("POST")
 

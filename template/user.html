@@ -1,9 +1,9 @@
-<DOCTYPE html>
+<!DOCTYPE html>
     <html lang="ru">
     <head>
         <meta charset="UTF-8">
         <title>Форма аутентификации</title>
-        <link rel="stylesheet" href="style/style.css">
+        <link rel="stylesheet" href="res/style/style.css">
         <style>
             .flex_buttons {
                 display: flex;
@@ -20,17 +20,17 @@
             }
         </style>
     </head>
-    <body>    
-    <form class="form" action="http://localhost:8080/send_new_user" method="get" enctype="application/x-www-form-urlencoded">
-    
-    
+    <body>
+    {{$userName := .}}
+    <form class="form" action="http://localhost:8080/block_user" method="post" enctype="application/x-www-form-urlencoded">
          <div class="form_group">
-            <div class="ramka">Учётная запись пользователя: <strong>Имя пользователя</strong></div>
-             <p><input type="checkbox" id="is_blocked" name="is_blocked">Заблокировать пользователя?</p>
+            <div class="ramka">Учётная запись пользователя: <strong>{{$userName}}</strong></div>
+             <p><input type="checkbox" name="is_blocked">Заблокировать пользователя?</p>
         </div>
          <div class="flex_buttons">
             <button>Редактор контрольных вопросов</button>
-            <button class="back_button">Выход</button>
+             <button type="submit">Сохранить</button>
+            <button class="back_button">Назад</button>
         </div>
     </form>
     </body>

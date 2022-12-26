@@ -13,6 +13,11 @@ type Authorization interface {
 	GetAllUsers() ([]model.User, error)
 	GetAllQuestions() ([]model.Question, error)
 	GetQuestionsByUserID(userID int) ([]model.Question, error)
+	UpdateUser(user model.User) error
+	DropUser(userName string) error
+	UpdateQuestion(question model.Question) error
+	DropQuestion(questionID int) error
+	AddQuestion(question model.Question) (int, error)
 }
 
 type Repoistory struct {

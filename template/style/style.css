@@ -59,7 +59,61 @@ button, .button {
 }
 
 .ramka{
-    border: 1px solid black; /* Белая рамка */
+    border: 1px solid black; /* Чёрная рамка */
     border-radius: 5px; /* Радиус скругления */
     margin: 20 0
+}
+
+table {
+    border: 1px solid grey;
+}
+/* границы ячеек первого ряда таблицы */
+th {
+    border: 1px solid grey;
+}
+/* границы ячеек тела таблицы */
+td {
+    border: 1px solid grey;
+}
+
+table{
+    border-spacing: 0;
+    border: 1px solid #333;
+    margin: 20px auto;
+    border-radius: 5px;
+    width: min-content;
+    white-space: nowrap;
+}
+
+tr:first-child{
+    font-weight: bold;
+    background-color: #333;
+    color: #fff;
+    text-transform: capitalize;
+}
+
+td{
+    border-left: 1px solid #333;
+    border-bottom: 1px solid #333;
+    padding: 0.5vh 10px;
+}
+
+
+td input{
+    padding: 0;
+    border: 0;
+    background-color: transparent;
+    outline: none;
+    color: inherit;
+    width: max-content;
+    height: 100%;
+}
+input::placeholder{
+    color: #867894;
+}
+
+input[type="submit"]{
+    display: block;
+    cursor: pointer;
+    margin: 0 auto;
 }

@@ -13,19 +13,19 @@ const (
 	questionsTable = "questions"
 )
 
-type AuthPostgres struct {
+type SQL struct {
 	db *sqlx.DB
 }
 
-func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
-	return &AuthPostgres{db: db}
+func NewAuthPostgres(db *sqlx.DB) *SQL {
+	return &SQL{db: db}
 }
 
-func (r *AuthPostgres) CreateUser(user model.User) (int, error) {
+func (r *SQL) CreateUser(user model.User) (int, error) {
 	var id int
 
 	query := fmt.Sprintf("INSERT INTO %s (user_name, count_of_required_questions, count_of_questions, count_of_invalid_attempts) values(?, ?, ?, ?) RETURNING user_id", usersTable)
-	row := r.db.QueryRow(query, user.Username, user.CountOfRequiredQuestions, user.CountOfQuestions, user.CountOfInvalidAttempts)
+	row := r.db.QueryRow(query, user.UserName, user.CountOfRequiredQuestions, user.CountOfQuestions, user.CountOfInvalidAttempts)
 	logrus.Debugf("repository/db/GetUser: %v", query)
 	if err := row.Scan(&id); err != nil {
 		logrus.Error("repository/db/CreateUser: ", err)
@@ -35,7 +35,7 @@ func (r *AuthPostgres) CreateUser(user model.User) (int, error) {
 	return id, nil
 }
 
-func (r *AuthPostgres) GetUser(username string) ([]model.User, error) {
+func (r *SQL) GetUser(username string) ([]model.User, error) {
 	var users []model.User
 	query := fmt.Sprintf("SELECT * FROM %s WHERE user_name=$1", usersTable)
 	err := r.db.Select(&users, query, username)
@@ -48,7 +48,7 @@ func (r *AuthPostgres) GetUser(username string) ([]model.User, error) {
 	return users, err
 }
 
-func (r *AuthPostgres) CreateQuestions(questions []model.Question) (int, error) {
+func (r *SQL) CreateQuestions(questions []model.Question) (int, error) {
 	var id int
 
 	valueStrings := make([]string, 0, len(questions))
@@ -71,8 +71,8 @@ func (r *AuthPostgres) CreateQuestions(questions []model.Question) (int, error) 
 	return id, nil
 }
 
-func (r *AuthPostgres) GetAllUsers() ([]model.User, error) {
-	var users []model.User
+func (r *SQL) GetAllUsers() ([]model.User, error) {
+	users := []model.User{}
 	query := fmt.Sprintf("SELECT * FROM %s WHERE user_name !='admin'", usersTable)
 	logrus.Debugf("repository/db/GetAllUsers: %v", query)
 	err := r.db.Select(&users, query)
@@ -84,7 +84,7 @@ func (r *AuthPostgres) GetAllUsers() ([]model.User, error) {
 	return users, err
 }
 
-func (r *AuthPostgres) GetAllQuestions() ([]model.Question, error) {
+func (r *SQL) GetAllQuestions() ([]model.Question, error) {
 	var questions []model.Question
 	query := fmt.Sprintf("SELECT * FROM %s", questionsTable)
 	logrus.Debugf("repository/db/GetAllQuestionsr: %v", query)
@@ -97,7 +97,7 @@ func (r *AuthPostgres) GetAllQuestions() ([]model.Question, error) {
 	return questions, err
 }
 
-func (r *AuthPostgres) GetQuestionsByUserID(userID int) ([]model.Question, error) {
+func (r *SQL) GetQuestionsByUserID(userID int) ([]model.Question, error) {
 	var questions []model.Question
 	query := fmt.Sprintf("SELECT * FROM %s WHERE user_id = $1", questionsTable)
 	logrus.Debugf("repository/db/GetQuestionsByUser: %v", query)
@@ -108,4 +108,60 @@ func (r *AuthPostgres) GetQuestionsByUserID(userID int) ([]model.Question, error
 	}
 
 	return questions, err
+}
+
+func (r *SQL) UpdateUser(user model.User) error {
+	query := fmt.Sprintf("UPDATE %s SET user_name=?, count_of_required_questions=?, count_of_invalid_attempts=?, count_of_questions=?, is_blocked=? WHERE user_id=?", usersTable)
+	logrus.Debugf("repository/db/UpdateUser: %v", query)
+	_, err := r.db.Exec(query, user.UserName, user.CountOfRequiredQuestions, user.CountOfInvalidAttempts, user.CountOfQuestions, user.IsBlocked, user.UserID)
+	if err != nil {
+		logrus.Error("repository/db/UpdateUser: ", err)
+		return err
+	}
+	return nil
+}
+
+func (r *SQL) UpdateQuestion(question model.Question) error {
+	query := fmt.Sprintf("UPDATE %s SET question_text=?, answer_text=? WHERE question_id=?", questionsTable)
+	logrus.Debugf("repository/db/UpdateQuestion: %v", query)
+	_, err := r.db.Exec(query, question.Title, question.Answer, question.QuestionID)
+	if err != nil {
+		logrus.Error("repository/db/UpdateQuestion: ", err)
+		return err
+	}
+	return nil
+}
+
+func (r *SQL) DropQuestion(questionID int) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE question_id=?", questionsTable)
+	logrus.Debugf("repository/db/DropQuestion: %v", query)
+	_, err := r.db.Exec(query, questionID)
+	if err != nil {
+		logrus.Error("repository/db/DropQuestion: ", err)
+		return err
+	}
+	return nil
+}
+
+func (r *SQL) DropUser(userName string) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE user_name=?", usersTable)
+	logrus.Debugf("repository/db/DropUser: %v", query)
+	_, err := r.db.Exec(query, userName)
+	if err != nil {
+		logrus.Error("repository/db/DropUser: ", err)
+		return err
+	}
+	return nil
+}
+
+func (r *SQL) AddQuestion(question model.Question) (int, error) {
+	var questionID int
+	query := fmt.Sprintf("INSERT INTO %s (user_id, question_text, answer_text) values (?, ?, ?) returning question_id", questionsTable)
+	logrus.Debugf("repository/db/AddQuestion: %v", query)
+	err := r.db.QueryRow(query, question.UserID, question.Title, question.Answer).Scan(&questionID)
+	if err != nil {
+		logrus.Error("repository/db/AddQuestion: ", err)
+		return 0, err
+	}
+	return questionID, nil
 }

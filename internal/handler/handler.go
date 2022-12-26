@@ -9,7 +9,7 @@ type Handler struct {
 	services *service.Service
 
 	//TODO КОСТЫЛИ ЕБУЧИЕ, ЗА ЭТО ТЫ ПОПАДЁШЬ В АД!
-	questionOfCurrentUser *model.ShitUser
+	cache *model.Cache
 }
 
 func NewHandler(service *service.Service) *Handler {

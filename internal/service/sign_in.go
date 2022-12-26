@@ -2,7 +2,7 @@ package service
 
 import "cripta_course_work/internal/model"
 
-func (s *AuthService) SignIn(userName string) (*model.User, error) {
+func (s *AuthService) GetUserByUserName(userName string) (*model.User, error) {
 	users, err := s.repo.GetUser(userName)
 	if err != nil {
 		return nil, err

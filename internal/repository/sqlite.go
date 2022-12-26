@@ -29,7 +29,8 @@ func NewSqlite() (*sqlx.DB, error) {
 	       user_name          text    not null,
 	       count_of_required_questions integer not null,
 	       count_of_questions integer not null,
-	       count_of_invalid_attempts integer not null
+	       count_of_invalid_attempts integer not null,
+	       is_blocked bool not null default false,
 	   	   constraint user_name_unique unique (user_name)
 	   );
 	   create table questions

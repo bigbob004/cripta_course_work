@@ -8,7 +8,7 @@ import (
 
 // Костыли и сюда добрались
 
-func (s *AuthService) ValidateQuestions(userAnswers []string, user *model.ShitUser) bool {
+func (s *AuthService) ValidateQuestions(userAnswers []string, user *model.Cache) bool {
 	//Сначала отбираем ответы на обязательные вопросы
 	authAnswers := make([]string, 0, len(user.AuthQuestionToAnswer))
 	authUserAnswers := make([]string, 0, len(user.AuthQuestionToAnswer))

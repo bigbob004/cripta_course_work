@@ -5,50 +5,103 @@
         <title>Форма аутентификации</title>
         <link rel="stylesheet" href="res/style/style.css">
         <style>
-            .phrase {
-                margin: 20 0;
-                text-align: center;
-                color: #A9A9A9;;
+            tr > td:last-child, tr:not(:last-child) > td:nth-last-child(2){
+                padding: 0;
+                min-width: 3vh;
+                min-height: 3vh;
+                font-weight: bold;
             }
-            .question_number{
-                font-weight: 800;
-                text-align: left;
-                margin: 20 0
+
+            tr:not(:first-child):not(:last-child) > td:last-child{
+                background-color: #ea2e2e;
+                color: white
             }
-            input {
-                margin: 10 0
+
+            tr:not(:first-child):not(:last-child) > td:nth-last-child(2){
+                color: #fff;
+                background-color: grey;
             }
-            .flex_buttons {
-                display: flex;
-                justify-content: space-between;
+
+            tr:last-child{
+                background-color: #2678D03C;
             }
-            .back_button {
-                background-color: red;
+
+            tr:last-child > td:last-child {
+                background-color: #0071F0;
+                color: white
             }
         </style>
     </head>
     <body>
-    {{range $index, $element := .}}
-    <form class="form" action="http://localhost:8080/?????" method="post" enctype="application/x-www-form-urlencoded">
-    <div class="question_number"> Вопрос {{inc $index}}. </div>
-    <div class="form_group">
-        <input type="hidden" name="id" value="{{$element.QuestionID}}">
-        <p>Вопрос</p>
-        <input placeholder="Вопрос" name="question" value="{{$element.Title}}">
-        <p>Ответ</p>
-        <input placeholder="Ответ" name="answer" value="{{$element.Answer}}">
-    </div>
-    </form>>
-    {{end}}
-    <form class="form" action="http://localhost:8080/send_new_user" method="post" enctype="application/x-www-form-urlencoded">
-        
-        <h1 class="form_title">Редактор контрольных вопросов</h1>
-
-         <div class="flex_buttons">
-            <button>Добавить вопрос</button>
-            <button>Сохранить</button>
-            <button class="back_button">Отменить</button>
-        </div>
-    </form>
+    {{$editingID := .EditingQuestionID}}
+    <table class="mono">
+        <tr>
+            <td>№</td>
+            <td>Вопрос</td>
+            <td>Ответ</td>
+            <td></td>
+            <td></td>
+        </tr>
+        {{range $index, $value := .ModelQuestions}}
+        <tr>
+            <td>{{inc $index}}</td>
+            {{if eq $value.QuestionID $editingID}}
+            <td><label>
+                <input form="upd" placeholder="Новое значение:" type="text"
+                value="{{$value.Title}}" name="question" autofocus autocomplete="off">
+            </label></td>
+            {{else}}
+            <td>{{$value.Title}}</td>
+            {{end}}
+            {{if eq $value.QuestionID $editingID}}
+            <td><label>
+                <input form="upd" placeholder="Новое значение:" type="text"
+                       value="{{$value.Answer}}" name="answer" autofocus autocomplete="off">
+            </label></td>
+            {{else}}
+            <td>{{$value.Answer}}</td>
+            {{end}}
+            <td>
+                {{if eq $editingID $value.QuestionID}}
+                <form action="http://localhost:8080/edit_question_with_id" method="post" id="upd">
+                    <input type="hidden" name="question_id" value="{{$editingID}}">
+                    <input type="submit" value="s" alt="Сохранить">
+                </form>
+                {{else}}
+                <form action="http://localhost:8080/edit_question" method="get">
+                    <input type="hidden" name="question_id" value="{{$value.QuestionID}}">
+                    <input type="submit" value="e" alt="Изменить">
+                </form>
+                {{end}}
+            </td>
+            <td>
+                <form action="http://localhost:8080/delete_question" method="post">
+                    <input type="hidden" name="question_id" value="{{$value.QuestionID}}">
+                    <input type="submit" value="×" style="color: white;" alt="Удалить">
+                </form>
+        <tr>
+            {{end}}
+        <tr><td></td>
+            <td><label>
+                <input type="text" form="ins"
+                name="question"
+                placeholder="Введите вопрос"
+                autocomplete="off"
+                required>
+            </label></td>
+            <td><label>
+                <input type="text" form="ins"
+               name="answer"
+               placeholder="Введите вопрос"
+               autocomplete="off"
+               required>
+            </label></td>
+            <td colspan="2">
+                <form action="http://localhost:8080/add_question" method="post" id="ins">
+                    <input type="submit" value="+" alt="Добавить">
+                </form>
+            </td>
+        </tr>
+    </table>
     </body>
     </html>

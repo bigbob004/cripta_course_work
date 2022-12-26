@@ -50,3 +50,10 @@ func IsEq(a, b []string) bool {
 	}
 	return true
 }
+
+func ConvertToBool(s string) bool {
+	if s == "on" {
+		return true
+	}
+	return false
+}

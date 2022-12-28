@@ -8,7 +8,6 @@ import (
 type Handler struct {
 	services *service.Service
 
-	//TODO КОСТЫЛИ ЕБУЧИЕ, ЗА ЭТО ТЫ ПОПАДЁШЬ В АД!
 	cache *model.Cache
 }
 
@@ -31,5 +30,3 @@ func (h *Handler) InitRoutes() *gin.Engine {
 }
 
 */
-
-//TODO: переделать на gorilla/mux

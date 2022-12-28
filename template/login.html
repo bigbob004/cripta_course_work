@@ -10,13 +10,14 @@
             }
         </style>
     </head>
-    <body>    
+    <body>
+    <div class="information">Автор: Каменев Руслан, А-05-19<div/>
     <form class="form" action="http://localhost:8080/login" method="post" enctype="application/x-www-form-urlencoded">
         
         <h1 class="form_title">Вход</h1>
     
          <div class="form_group">
-            <input placeholder="Логин" name="user_name" required>
+            <input placeholder="Логин" name="user_name" autocomplete="off" required>
             {{if .IsThereUserWithUserName}}
              <p>Пользователя c таким именем нет в системе, обратитесь к администратору</p>
              {{end}}
@@ -26,9 +27,8 @@
          </div>
 
         <button class="form__button">ВОЙТИ</button>
-        <!-- TODO по этой кнопке сделать graceFulShutDown-->
         <button class="back_button" form="exit">Выход</button>
     </form>
-    <form action="http://localhost:8080/exit" method="post" enctype="application/x-www-form-urlencoded" id="exit"></form>
+    <form action="http://localhost:8080/exit" method="get" enctype="application/x-www-form-urlencoded" id="exit"></form>
     </body>
     </html>

@@ -60,8 +60,6 @@ func (h *Handler) EditQuestion(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("что-то пошло не так"))
 			return
 		}
-		//TODO сделать отдельную функцию сбора данных
-		//TODO: маппинг и валидация
 		editingQuestionID, _ := strconv.Atoi(r.FormValue("question_id"))
 		funcMap := template.FuncMap{
 			// The name "inc" is what the function will be called in the template text.
@@ -93,8 +91,6 @@ func (h *Handler) EditQuestionWithID(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("что-то пошло не так"))
 			return
 		}
-		//TODO сделать отдельную функцию сбора данных
-		//TODO: маппинг и валидация
 		var cacheOfCurrentUser []model.Question
 		if h.cache.ChoosenUser == nil {
 			cacheOfCurrentUser = h.cache.ModelQuestion

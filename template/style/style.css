@@ -27,6 +27,14 @@ input, button, select {
     padding: 5px;
 }
 
+information {
+    font-family:'Montserrat';
+    letter-spacing: 1px;
+    font-size: 16px;
+    border-radius: 5px;
+    padding: 5px;
+}
+
 input, select{
     width: 100%;
     border: solid 2px black;

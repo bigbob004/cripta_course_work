@@ -76,7 +76,6 @@ func (h *Handler) EditUserInformation(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		//TODO Валидация на количество обязательных вопросов
 		h.cache.ChoosenUser.User.IsBlocked = is_blocked
 		h.cache.ChoosenUser.User.CountOfRequiredQuestions = countOfRequiredQuestions
 		h.cache.ChoosenUser.User.CountOfInvalidAttempts = countOfInvalidAttempts

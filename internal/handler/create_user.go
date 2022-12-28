@@ -20,8 +20,6 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		if err := r.ParseForm(); err != nil {
 			w.Write([]byte("что-то пошло не так"))
 		}
-		//TODO сделать отдельную функцию сбора данных
-		//TODO: маппинг и валидация
 		userName := r.FormValue("user_name")
 		//Проверяем, что user_name не занят
 		user, err := h.services.Authorization.GetUserByUserName(userName)

@@ -16,13 +16,14 @@
                 }
             </style>
     </head>
-    <body>    
+    <body>
+    <div class="information">Автор: Каменев Руслан, А-05-19<div/>
     <form class="form" action="http://localhost:8080/auth" method="post" enctype="application/x-www-form-urlencoded">
         <h1 class="form_title">Вход</h1>
         {{range .Questions}}
          <div>Контрольный вопрос:</div>
          <div class="qeustion"> {{ . }}:</div>
-        <input placeholder="Ответ" name="answer" required>
+        <input placeholder="Ответ" name="answer" autocomplete="off" required>
         {{end}}
         {{if .IsThereError}}
         <p>Вы неправильно ответили на контрольные вопросы. Оставшееся кол-во попыток входа: {{.RemainingCountAttempts}}</p>

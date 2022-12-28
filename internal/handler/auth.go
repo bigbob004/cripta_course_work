@@ -33,6 +33,7 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/account", http.StatusFound)
 		} else {
 			if h.cache.RemainingCountAttempts-1 == 0 {
+
 				http.Redirect(w, r, "/exit", http.StatusFound)
 			}
 			h.cache.RemainingCountAttempts--

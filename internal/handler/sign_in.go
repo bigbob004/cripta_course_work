@@ -19,7 +19,7 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("что-то пошло не так"))
 		}
 		userName := r.FormValue("user_name")
-		//TODO: валидация
+
 		if h.cache != nil && h.cache.UserName == userName {
 			http.Redirect(w, r, fmt.Sprintf("/auth?user_id=%d", h.cache.UserID), http.StatusFound)
 			return
@@ -29,8 +29,6 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("что-то пошло не так"))
 		}
 		if user != nil {
-			//TODO пока не будем париться и будем делать по-тупому
-			//TODO КОСТЫЛИ ЕБУЧИЕ, ЗА ЭТО ТЫ ПОПАДЁШЬ В АД!
 			if user.IsBlocked {
 				data := ViewData{IsThereUserWithUserName: false, IsUserBlocked: true}
 				tmpl, _ := template.ParseFiles("./template/login.html")
@@ -50,7 +48,6 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) SignInView(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		//TODO: здесь же можно обрабатывать случай IsThereError = true
 		data := ViewData{IsThereUserWithUserName: false, IsUserBlocked: false}
 		tmpl, _ := template.ParseFiles("./template/login.html")
 		tmpl.Execute(w, data)

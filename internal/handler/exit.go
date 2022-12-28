@@ -1,10 +1,12 @@
 package handler
 
 import (
-	"log"
+	"github.com/sirupsen/logrus"
 	"net/http"
+	"os"
 )
 
 func (h *Handler) Exit(w http.ResponseWriter, r *http.Request) {
-	log.Fatal("Завершение работы приложения")
+	logrus.Debug("Завершение работы приложения")
+	os.Exit(0)
 }

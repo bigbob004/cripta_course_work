@@ -73,7 +73,7 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 			CountOfInvalidAttempts:   countOfInvalidAttempts,
 		}
 		h.services.CreateUser(newUser, questionsAndAnswers)
-		http.Redirect(w, r, "/account", http.StatusMovedPermanently)
+		http.Redirect(w, r, "/account", http.StatusFound)
 	}
 }
 

@@ -4,7 +4,6 @@ import (
 	"cripta_course_work/internal/handler"
 	"cripta_course_work/internal/repository"
 	"cripta_course_work/internal/service"
-	"fmt"
 	"github.com/gorilla/mux"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/sirupsen/logrus"
@@ -45,7 +44,8 @@ func main() {
 	router.HandleFunc("/send_new_user", handlers.CreateUser).Methods("POST")
 	router.HandleFunc("/send_new_user", handlers.CreateUserView).Methods("GET")
 
-	router.Handle("/account", handlers.Middleware(http.HandlerFunc(handlers.AccountView)))
+	router.Handle("/account", handlers.Middleware(http.HandlerFunc(handlers.AccountView))).Methods("GET")
+	router.HandleFunc("/edit_account", handlers.EditAccount).Methods("POST")
 
 	router.HandleFunc("/edit_questions", handlers.EditQuestionsView).Methods("GET")
 	router.HandleFunc("/edit_question", handlers.EditQuestion).Methods("GET")
@@ -56,14 +56,14 @@ func main() {
 	router.HandleFunc("/signout", handlers.SignOut).Methods("POST")
 
 	router.HandleFunc("/edit_user", handlers.EditUserView).Methods("GET")
-	router.HandleFunc("/block_user", handlers.BlockUser).Methods("POST")
+	router.HandleFunc("/edit_user_information", handlers.EditUserInformation).Methods("POST")
 
-	router.HandleFunc("/exit", handlers.Exit).Methods("POST")
+	router.HandleFunc("/exit", handlers.Exit).Methods("GET")
 
 	fileServer := http.FileServer(http.Dir("./template"))
 	router.PathPrefix("/res/").Handler(http.StripPrefix("/res/", fileServer))
 	http.Handle("/", router)
-	fmt.Println("Server is listening...")
+	logrus.Debug("Server is listening... http://localhost:8080/login")
 	http.ListenAndServe(":8080", nil)
 }
 

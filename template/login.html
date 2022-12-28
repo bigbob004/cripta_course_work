@@ -18,7 +18,7 @@
          <div class="form_group">
             <input placeholder="Логин" name="user_name" required>
             {{if .IsThereUserWithUserName}}
-             <p>Пользователь заблокирован, обратитесь к администратору</p>
+             <p>Пользователя c таким именем нет в системе, обратитесь к администратору</p>
              {{end}}
              {{if .IsUserBlocked}}
              <p>Пользователь заблокирован, обратитесь к администратору</p>

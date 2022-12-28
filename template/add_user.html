@@ -38,7 +38,7 @@
         <p>Данное имя уже занято!</p>
         {{end}}
         <input type="number" placeholder="Максимальное допустимое количество неверных попыток ответа на контрольный вопрос" name="count_of_invalid_attempts" required min="1" max="5">
-        <input placeholder="Количество обязательных вопросов" name="count_of_required_questions" required>
+        <input type="number" placeholder="Количество обязательных вопросов" name="count_of_required_questions" required min="1" max="5">
         {{if $errWithCountOfRequieredQuestions}}
         <p>Количество обязательных вопросов не может быть больше количества введёных вопросов!</p>
         {{end}}

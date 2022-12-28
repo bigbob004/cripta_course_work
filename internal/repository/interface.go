@@ -14,6 +14,7 @@ type Authorization interface {
 	GetAllQuestions() ([]model.Question, error)
 	GetQuestionsByUserID(userID int) ([]model.Question, error)
 	UpdateUser(user model.User) error
+	GetUserByID(userID int) ([]model.User, error)
 	DropUser(userName string) error
 	UpdateQuestion(question model.Question) error
 	DropQuestion(questionID int) error

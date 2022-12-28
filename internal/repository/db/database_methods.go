@@ -35,6 +35,18 @@ func (r *SQL) CreateUser(user model.User) (int, error) {
 	return id, nil
 }
 
+func (r *SQL) GetUserByID(userID int) ([]model.User, error) {
+	var users []model.User
+	query := fmt.Sprintf("SELECT * FROM %s WHERE user_id=$1", usersTable)
+	err := r.db.Select(&users, query, userID)
+	logrus.Debugf("repository/db/GetUserByID: %v", query)
+	if err != nil {
+		logrus.Error("repository/db/GetUserByID: ", err)
+		return []model.User{}, err
+	}
+	return users, err
+}
+
 func (r *SQL) GetUser(username string) ([]model.User, error) {
 	var users []model.User
 	query := fmt.Sprintf("SELECT * FROM %s WHERE user_name=$1", usersTable)

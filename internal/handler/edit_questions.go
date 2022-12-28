@@ -2,6 +2,7 @@ package handler
 
 import (
 	"cripta_course_work/internal/model"
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"html/template"
 	"net/http"
@@ -12,6 +13,8 @@ import (
 type ViewDataEditQuestions struct {
 	EditingQuestionID int
 	ModelQuestions    []model.Question
+	Err               string
+	IsThereError      bool
 }
 
 func (h *Handler) EditQuestionsView(w http.ResponseWriter, r *http.Request) {
@@ -20,6 +23,11 @@ func (h *Handler) EditQuestionsView(w http.ResponseWriter, r *http.Request) {
 		if err := r.ParseForm(); err != nil {
 			w.Write([]byte("что-то пошло не так"))
 			return
+		}
+		var isThereError bool
+		errDeleting := r.FormValue("err")
+		if len(errDeleting) != 0 {
+			isThereError = true
 		}
 		editingQuestionID, _ := strconv.Atoi(r.FormValue("question_id"))
 		funcMap := template.FuncMap{
@@ -33,7 +41,12 @@ func (h *Handler) EditQuestionsView(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			logrus.Error(err)
 		}
-		err = tmpl.Execute(w, ViewDataEditQuestions{ModelQuestions: h.cache.ModelQuestion, EditingQuestionID: editingQuestionID})
+
+		if h.cache.ChoosenUser == nil {
+			err = tmpl.Execute(w, ViewDataEditQuestions{ModelQuestions: h.cache.ModelQuestion, EditingQuestionID: editingQuestionID, Err: errDeleting, IsThereError: isThereError})
+		} else {
+			err = tmpl.Execute(w, ViewDataEditQuestions{ModelQuestions: h.cache.ChoosenUser.Questions, EditingQuestionID: editingQuestionID, Err: errDeleting, IsThereError: isThereError})
+		}
 		if err != nil {
 			logrus.Error(err)
 		}
@@ -61,7 +74,11 @@ func (h *Handler) EditQuestion(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			logrus.Error(err)
 		}
-		err = tmpl.Execute(w, ViewDataEditQuestions{ModelQuestions: h.cache.ModelQuestion, EditingQuestionID: editingQuestionID})
+		if h.cache.ChoosenUser == nil {
+			err = tmpl.Execute(w, ViewDataEditQuestions{ModelQuestions: h.cache.ModelQuestion, EditingQuestionID: editingQuestionID})
+		} else {
+			err = tmpl.Execute(w, ViewDataEditQuestions{ModelQuestions: h.cache.ChoosenUser.Questions, EditingQuestionID: editingQuestionID})
+		}
 		if err != nil {
 			logrus.Error(err)
 		}
@@ -79,10 +96,10 @@ func (h *Handler) EditQuestionWithID(w http.ResponseWriter, r *http.Request) {
 		//TODO сделать отдельную функцию сбора данных
 		//TODO: маппинг и валидация
 		var cacheOfCurrentUser []model.Question
-		if h.cache.UserName == "admin" {
+		if h.cache.ChoosenUser == nil {
 			cacheOfCurrentUser = h.cache.ModelQuestion
 		} else {
-			cacheOfCurrentUser = h.cache.QuestionsOfChoosenUser
+			cacheOfCurrentUser = h.cache.ChoosenUser.Questions
 		}
 
 		editingQuestionID, _ := strconv.Atoi(r.FormValue("question_id"))
@@ -101,7 +118,7 @@ func (h *Handler) EditQuestionWithID(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		http.Redirect(w, r, "/edit_questions", http.StatusMovedPermanently)
+		http.Redirect(w, r, "/edit_questions", http.StatusFound)
 	}
 }
 
@@ -115,12 +132,28 @@ func (h *Handler) DeleteQuestionWithID(w http.ResponseWriter, r *http.Request) {
 		}
 
 		deletingQuestionID, _ := strconv.Atoi(r.FormValue("question_id"))
-		if h.cache.UserName == "admin" {
-			h.cache.ModelQuestion = deleteFromCache(h.cache.ModelQuestion, deletingQuestionID)
+		var errDeleting string
+		if h.cache.ChoosenUser == nil {
+			if len(h.cache.ModelQuestion) == 1 {
+				errDeleting = "Количество вопросов не может быть меньше 1"
+			} else if h.cache.CountOfRequiredQuestions == len(h.cache.ModelQuestion) {
+				errDeleting = "Общее количество вопросов не можеть быть меньше количество обязательных вопросов"
+			} else {
+				h.cache.ModelQuestion = deleteFromCache(h.cache.ModelQuestion, deletingQuestionID)
+			}
 		} else {
-			h.cache.QuestionsOfChoosenUser = deleteFromCache(h.cache.QuestionsOfChoosenUser, deletingQuestionID)
+			if len(h.cache.ChoosenUser.Questions) == 1 {
+				errDeleting = "Количество вопросов не может быть меньше 1"
+			} else if h.cache.ChoosenUser.User.CountOfRequiredQuestions == len(h.cache.ChoosenUser.Questions) {
+				errDeleting = "Общее количество вопросов не можеть быть меньше количество обязательных вопросов"
+			} else {
+				h.cache.ChoosenUser.Questions = deleteFromCache(h.cache.ChoosenUser.Questions, deletingQuestionID)
+			}
 		}
-
+		if errDeleting != "" {
+			http.Redirect(w, r, fmt.Sprintf("/edit_questions?err=%s", errDeleting), http.StatusFound)
+			return
+		}
 		err := h.services.DropQuestion(deletingQuestionID)
 		if err != nil {
 			logrus.Error("handler/DeleteQuestionWithID: ", err)
@@ -128,7 +161,7 @@ func (h *Handler) DeleteQuestionWithID(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		http.Redirect(w, r, "/edit_questions", http.StatusMovedPermanently)
+		http.Redirect(w, r, "/edit_questions", http.StatusFound)
 	}
 }
 
@@ -140,24 +173,43 @@ func (h *Handler) AddQuestion(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("что-то пошло не так"))
 			return
 		}
-		userID := h.cache.UserID
-		newTitele := r.FormValue("question")
-		newAnswer := r.FormValue("answer")
-		newQuestion := model.Question{
-			UserID: userID,
-			Title:  newTitele,
-			Answer: newAnswer,
+		if h.cache.ChoosenUser == nil {
+			userID := h.cache.UserID
+			newTitele := r.FormValue("question")
+			newAnswer := r.FormValue("answer")
+			newQuestion := model.Question{
+				UserID: userID,
+				Title:  newTitele,
+				Answer: newAnswer,
+			}
+			questionID, err := h.services.AddQuestion(newQuestion)
+			if err != nil {
+				logrus.Error("handler/AddQuestion: ", err)
+				w.Write([]byte("что-то пошло не так"))
+				return
+			}
+			newQuestion.QuestionID = questionID
+			h.cache.ModelQuestion = append(h.cache.ModelQuestion, newQuestion)
+		} else {
+			userID := h.cache.ChoosenUser.User.UserID
+			newTitele := r.FormValue("question")
+			newAnswer := r.FormValue("answer")
+			newQuestion := model.Question{
+				UserID: userID,
+				Title:  newTitele,
+				Answer: newAnswer,
+			}
+			questionID, err := h.services.AddQuestion(newQuestion)
+			if err != nil {
+				logrus.Error("handler/AddQuestion: ", err)
+				w.Write([]byte("что-то пошло не так"))
+				return
+			}
+			newQuestion.QuestionID = questionID
+			h.cache.ChoosenUser.Questions = append(h.cache.ChoosenUser.Questions, newQuestion)
 		}
-		questionID, err := h.services.AddQuestion(newQuestion)
-		if err != nil {
-			logrus.Error("handler/AddQuestion: ", err)
-			w.Write([]byte("что-то пошло не так"))
-			return
-		}
-		newQuestion.QuestionID = questionID
-		h.cache.ModelQuestion = append(h.cache.ModelQuestion, newQuestion)
 
-		http.Redirect(w, r, "/edit_questions", http.StatusMovedPermanently)
+		http.Redirect(w, r, "/edit_questions", http.StatusFound)
 	}
 }
 

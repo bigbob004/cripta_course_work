@@ -15,6 +15,7 @@ type Authorization interface {
 	UpdateQuestion(question model.Question) error
 	DropQuestion(questionID int) error
 	AddQuestion(question model.Question) (int, error)
+	GetUserByID(userID int) ([]model.User, error)
 	//GenerateToken(username string) (string, error)
 }
 

@@ -30,10 +30,10 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
 		}
 		isEqual := h.services.ValidateQuestions(userAnswers, h.cache)
 		if isEqual {
-			http.Redirect(w, r, "/account", http.StatusMovedPermanently)
+			http.Redirect(w, r, "/account", http.StatusFound)
 		} else {
 			if h.cache.RemainingCountAttempts-1 == 0 {
-				http.Redirect(w, r, "/exit", http.StatusMovedPermanently)
+				http.Redirect(w, r, "/exit", http.StatusFound)
 			}
 			h.cache.RemainingCountAttempts--
 			data := ViewDataForAuth{

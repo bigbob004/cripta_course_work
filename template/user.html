@@ -21,17 +21,22 @@
         </style>
     </head>
     <body>
-    {{$userName := .}}
-    <form class="form" action="http://localhost:8080/block_user" method="post" enctype="application/x-www-form-urlencoded">
-         <div class="form_group">
-            <div class="ramka">Учётная запись пользователя: <strong>{{$userName}}</strong></div>
-             <p><input type="checkbox" name="is_blocked">Заблокировать пользователя?</p>
-        </div>
+    {{$user := .User}}
+    {{$err := .Err}}
+    {{$isThereError := .IsThereError}}
+    <form class="form" action="http://localhost:8080/edit_user_information" method="post" enctype="application/x-www-form-urlencoded">
+            <div class="ramka">Учётная запись пользователя: <strong>{{$user.UserName}}</strong></div>
+             <p>Заблокировать пользователя?<input type="checkbox" style="width:auto;margin-left:20px" name="is_blocked" {{if $user.IsBlocked }} checked="checked" {{end}}></p>
+            <p>Количество обязательных вопросов<input name="count_of_required_questions" type="number" value="{{$user.CountOfRequiredQuestions}}" min="1" placeholder="" required></p>
+            {{if $isThereError}} <p>{{$err}}</p>{{end}}
+            <p>Максимальное допустимое количество неверных попыток ответа на контрольные вопросы<input name="count_of_invalid_attempts" type="number" value="{{$user.CountOfInvalidAttempts}}" min="1" placeholder="" required></p>
          <div class="flex_buttons">
-            <button>Редактор контрольных вопросов</button>
+            <button type="submit" form="question_redactor_of_choosen_user">Редактор контрольных вопросов</button>
              <button type="submit">Сохранить</button>
-            <button class="back_button">Назад</button>
+            <button class="back_button" form="back">Назад</button>
         </div>
     </form>
+    <form action="http://localhost:8080/edit_questions" method="get" enctype="application/x-www-form-urlencoded" id = "question_redactor_of_choosen_user"></form>
+    <form action="http://localhost:8080/account" method="get" enctype="application/x-www-form-urlencoded" id = "back"> </form>
     </body>
     </html>

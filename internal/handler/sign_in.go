@@ -21,7 +21,7 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 		userName := r.FormValue("user_name")
 		//TODO: валидация
 		if h.cache != nil && h.cache.UserName == userName {
-			http.Redirect(w, r, fmt.Sprintf("/auth?user_id=%d", h.cache.UserID), http.StatusMovedPermanently)
+			http.Redirect(w, r, fmt.Sprintf("/auth?user_id=%d", h.cache.UserID), http.StatusFound)
 			return
 		}
 		user, err := h.services.Authorization.GetUserByUserName(userName)
@@ -37,8 +37,8 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 				tmpl.Execute(w, data)
 				return
 			}
-			h.cache = &model.Cache{UserName: user.UserName, UserID: user.UserID, RemainingCountAttempts: user.CountOfInvalidAttempts, CountOfRequiredQuestions: user.CountOfRequiredQuestions}
-			http.Redirect(w, r, fmt.Sprintf("/auth?user_id=%d", user.UserID), http.StatusMovedPermanently)
+			h.cache = &model.Cache{UserName: user.UserName, UserID: user.UserID, RemainingCountAttempts: user.CountOfInvalidAttempts, CountOfInvalidAttempts: user.CountOfInvalidAttempts, CountOfRequiredQuestions: user.CountOfRequiredQuestions}
+			http.Redirect(w, r, fmt.Sprintf("/auth?user_id=%d", user.UserID), http.StatusFound)
 		} else {
 			data := ViewData{IsThereUserWithUserName: true, IsUserBlocked: false}
 			tmpl, _ := template.ParseFiles("./template/login.html")

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"cripta_course_work/internal/model"
 	"cripta_course_work/internal/service"
 	tools "cripta_course_work/pkg"
 	"github.com/sirupsen/logrus"
@@ -20,6 +21,7 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		if err := r.ParseForm(); err != nil {
 			w.Write([]byte("что-то пошло не так"))
+			return
 		}
 		//Получаем ответы пользователя на shuffle вопросы
 		var userAnswers []string
@@ -33,8 +35,21 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/account", http.StatusFound)
 		} else {
 			if h.cache.RemainingCountAttempts-1 == 0 {
-
-				http.Redirect(w, r, "/exit", http.StatusFound)
+				user := model.User{
+					UserName:                 h.cache.UserName,
+					UserID:                   h.cache.UserID,
+					CountOfRequiredQuestions: h.cache.CountOfRequiredQuestions,
+					CountOfInvalidAttempts:   h.cache.CountOfInvalidAttempts,
+					CountOfQuestions:         h.cache.CountOfQuestions,
+					IsBlocked:                true,
+				}
+				err := h.services.UpdateUser(user)
+				if err != nil {
+					logrus.Error("hander/Auth: ", err)
+					w.Write([]byte("что-то пошло не так"))
+					return
+				}
+				http.Redirect(w, r, "/signout", http.StatusFound)
 			}
 			h.cache.RemainingCountAttempts--
 			data := ViewDataForAuth{

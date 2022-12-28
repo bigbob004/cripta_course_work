@@ -14,6 +14,7 @@ type Cache struct {
 	RemainingCountAttempts   int
 	CountOfRequiredQuestions int
 	CountOfInvalidAttempts   int
+	CountOfQuestions         int
 }
 
 type ChoosenUserInformation struct {

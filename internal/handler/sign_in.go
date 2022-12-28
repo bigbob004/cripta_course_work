@@ -35,7 +35,7 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 				tmpl.Execute(w, data)
 				return
 			}
-			h.cache = &model.Cache{UserName: user.UserName, UserID: user.UserID, RemainingCountAttempts: user.CountOfInvalidAttempts, CountOfInvalidAttempts: user.CountOfInvalidAttempts, CountOfRequiredQuestions: user.CountOfRequiredQuestions}
+			h.cache = &model.Cache{UserName: user.UserName, UserID: user.UserID, RemainingCountAttempts: user.CountOfInvalidAttempts, CountOfInvalidAttempts: user.CountOfInvalidAttempts, CountOfRequiredQuestions: user.CountOfRequiredQuestions, CountOfQuestions: user.CountOfQuestions}
 			http.Redirect(w, r, fmt.Sprintf("/auth?user_id=%d", user.UserID), http.StatusFound)
 		} else {
 			data := ViewData{IsThereUserWithUserName: true, IsUserBlocked: false}

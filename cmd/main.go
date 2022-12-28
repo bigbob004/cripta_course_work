@@ -53,7 +53,7 @@ func main() {
 	router.HandleFunc("/delete_question", handlers.DeleteQuestionWithID).Methods("POST")
 	router.HandleFunc("/add_question", handlers.AddQuestion).Methods("POST")
 
-	router.HandleFunc("/signout", handlers.SignOut).Methods("POST")
+	router.HandleFunc("/signout", handlers.SignOut).Methods("GET")
 
 	router.HandleFunc("/edit_user", handlers.EditUserView).Methods("GET")
 	router.HandleFunc("/edit_user_information", handlers.EditUserInformation).Methods("POST")

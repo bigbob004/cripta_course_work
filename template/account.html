@@ -64,9 +64,9 @@
     </form>
 
     <form action="http://localhost:8080/edit_questions" method="get" enctype="application/x-www-form-urlencoded" id="edit_questions"></form>
-    <form action="http://localhost:8080/signout" method="post" enctype="application/x-www-form-urlencoded" id="signout"></form>
+    <form action="http://localhost:8080/signout" method="get" enctype="application/x-www-form-urlencoded" id="signout"></form>
     {{else}}
-    <form class="form" action="http://localhost:8080/signout" method="post" enctype="application/x-www-form-urlencoded">
+    <form class="form" action="http://localhost:8080/signout" method="get" enctype="application/x-www-form-urlencoded">
         <div class="form_group">
             <div class="ramka">Пользователь: <strong>{{.UserName}}</strong></div>
         </div>
